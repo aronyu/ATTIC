@@ -172,11 +172,9 @@ opts2.loc_network_path = 'models/pretrained/zap50k_deepstn_loc/' .. opts2.attrNa
 base_dir, im_folder = construct_directory(opts2.output_dir_path, opts2.attrName)
 
 
-
 ------------------------
 -- INPUTS :: Combined --
 ------------------------
-
 -- Set CUDA for GPU Usage
 cutorch.setDevice(1)   -- 0:CPU 1:GPU
 torch.setdefaulttensortype('torch.FloatTensor')
@@ -199,7 +197,6 @@ cutorch.manualSeed(SEED + attr_id)
 ----------------------------
 -- SETUP :: Pre-Generator --
 ----------------------------
-
 local method = 'kaiming'
 
 -- Top Branch
@@ -234,7 +231,6 @@ pgBotBranchY:add(nn.BatchNormalization(50))
 
 pgBotBranchY:add(nn.MulConstantT(image_stats.var))
 pgBotBranchY:add(nn.AddConstantT(image_stats.mean))
-
 
 local pgBotBranch = nn.ParallelTable()
 pgBotBranch:add(pgBotBranchZ)
@@ -272,7 +268,6 @@ local config_pregen = {learningRate = pregen_lr, learningRateDecay = pregen_lrd,
 -------------------------
 -- SETUP :: Attr2Image --
 -------------------------
-
 local ts_attr2image = os.clock()
 
 -- Load Pre-Trained Attr2Image Model
@@ -334,7 +329,6 @@ local config_ranker = {learningRate = opts2.lr, learningRates = params_lr_ranker
 print(string.format('Pre-Trained DeepSTN Model Loading Took %.2f sec\n', os.clock() - ts_deepstn))
 
 
-
 ------------------
 -- LOAD DATASET --
 ------------------
@@ -389,7 +383,6 @@ print(string.format('Dataset Loading Took %.2f sec\n', os.clock() - ts_dataset))
 -- Random Inputs for Pre-Gen
 pregen_inputs = torch.randn(num_synth_train, 512)
 
-
 print('Num Real Train Total: ' .. num_real_train_full .. ' pairs')
 print('Num Real Train: ' .. num_real_train .. ' pairs')
 print('Num Synth Train: ' .. num_synth_train .. ' pairs')
@@ -397,11 +390,9 @@ print('Num Real Val: ' .. num_real_val .. ' pairs')
 print('Num Real Test: ' .. num_real_test .. ' pairs')
 
 
-
 --------------
 -- TRAINING --
 --------------
-
 -- Get Global Model Parameters
 local paramsPreGen, gradParamsPreGen = netPreGen:getParameters()
 local paramsGen, gradParamsGen = netGen:getParameters()
@@ -445,7 +436,6 @@ batch_synth_targets = {}    -- dynamically determined ground truth w.r.t. output
 synth_rawY_top = torch.Tensor(opts2.numIter, num_synth_train):zero()
 synth_rawY_bot = torch.Tensor(opts2.numIter, num_synth_train):zero()
 synth_targets_auto = torch.Tensor(opts2.numIter, num_synth_train):zero()
-
 
 
 -----------------------------------------------------
@@ -590,11 +580,9 @@ local fPreGenX = function(x)
 end
 
 
-
 -------------------
 -- Training Loop --
 -------------------
-
 snapshot = {}
 
 print(string.format('Number of Epoches per Active Batch: %d', opts2.numIter))
@@ -605,7 +593,6 @@ state_pregen.evalCounter = 0     -- reset pregen counter
 synth_abatch_final_a = torch.Tensor(num_synth_train, 3, 227, 227):fill(0)
 synth_abatch_final_b = torch.Tensor(num_synth_train, 3, 227, 227):fill(0)
 synth_abatch_final_targets = torch.Tensor(num_synth_train, 1):fill(0)
-
 
 for epoch = 1, opts2.numIter do
   
@@ -631,7 +618,6 @@ for epoch = 1, opts2.numIter do
   ----------------------------
   -- Training on Real Pairs --
   ----------------------------
-  
   netRank:training()
   
   -- Real Mini-Batch (images)
@@ -649,7 +635,6 @@ for epoch = 1, opts2.numIter do
   -----------------------------
   -- Training on Synth Pairs --
   -----------------------------
-  
   -- Synth Mini-Batch (latent variables {z,y})
   for t = 1, num_synth_train, opts2.batchSize do
     
@@ -674,7 +659,6 @@ for epoch = 1, opts2.numIter do
   ----------------------------------
   -- Evaluate on Validation Pairs --
   ----------------------------------
-  
   netRank:evaluate()
   
   -- Real Mini-Batch for Validation (images)
@@ -694,7 +678,6 @@ for epoch = 1, opts2.numIter do
   ----------------------------
   -- Evaluate on Test Pairs --
   ----------------------------
-  
   -- Real Mini-Batch for Evaluation (images)
   for t = 1, num_real_test, opts2.batchSize do
     mini_batchsize = math.min(t + opts2.batchSize - 1, num_real_test) - t + 1
@@ -712,11 +695,8 @@ for epoch = 1, opts2.numIter do
   -------------
   -- Logging --
   -------------
-  
   -- Real + Synth w/ PreGen
   print(string.format('(Epoch %3.0f) R-Acc: %0.3f (%d/%d) || R-Loss: %0.3f || S-Acc: %0.3f (%d/%d) || S-Loss: %0.3f || PG-Loss: %0.3f ||| V-Acc: %0.3f (%d/%d) ||| T-Acc: %0.3f (%d/%d) ||| Elapsed %.2f sec', epoch, acc_real_log[epoch][1], count_real_right, num_real_train, loss_real_log[epoch][1], acc_synth_log[epoch][1], count_synth_right, num_synth_train, loss_synth_log[epoch][1], loss_pregen_log[epoch][1], acc_val_log[epoch][1], count_val_right, num_real_val, acc_test_log[epoch][1], count_test_right, num_real_test, os.clock() - start_time))
-  
-  
   
   -- Save Performance Logs
   if save_logs then
@@ -781,7 +761,6 @@ end
 -------------------
 -- Post Learning --
 -------------------
-
 -- Finalize Synth Images
 synth_abatch_final_a, synth_abatch_final_b, synth_abatch_final_labels = finlaize_synth_pairs(pregen_inputs, num_synth_train, opts2.batchSize)
 
@@ -794,4 +773,3 @@ myFile:write('data_a', synth_abatch_final_a:float())
 myFile:write('data_b', synth_abatch_final_b:float())
 myFile:write('labels', synth_abatch_final_labels:float())
 myFile:close()
-
