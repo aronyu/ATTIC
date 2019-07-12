@@ -55,7 +55,6 @@ require 'libs.deepstn.layers.MulConstantT'
 ----------------------------------
 -- INPUTS :: Control Parameters --
 ----------------------------------
-
 cmd = torch.CmdLine()
 cmd:option('-attrID', 1, 'Attribute ID')
 cmd:option('-trainIter', 100, '# of Training Epoches')
@@ -243,7 +242,6 @@ splitBranch:add(pgBotBranch)
 
 -- Initial Split
 local branchZ = nn.Copy()
---local branchZ = nn.Identity()
 
 local branchY = nn.Sequential()
 branchY:add(require('libs.deepstn.weight-init')(nn.Linear(512, 512), method))
