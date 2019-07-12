@@ -577,8 +577,6 @@ end
 -------------------
 snapshot = {}
 
-print(string.format('Number of Epoches per Active Batch: %d', opts2.numIter))
-
 state_pregen = {}
 state_pregen.evalCounter = 0     -- reset pregen counter
 
