@@ -408,33 +408,27 @@ local loss_synth_epoch = 0
 local loss_pregen_epoch = 0
 
 -- Initialize Performance Log
-loss_real_log = torch.Tensor(opts2.numIter, 1):fill(0)
-loss_synth_log = torch.Tensor(opts2.numIter, 1):fill(0)
-loss_pregen_log = torch.Tensor(opts2.numIter, 1):fill(0)
+local loss_real_log = torch.Tensor(opts2.numIter, 1):fill(0)
+local loss_synth_log = torch.Tensor(opts2.numIter, 1):fill(0)
+local loss_pregen_log = torch.Tensor(opts2.numIter, 1):fill(0)
 
-acc_real_log = torch.Tensor(opts2.numIter, 1):fill(0) 
-acc_synth_log = torch.Tensor(opts2.numIter, 1):fill(0)
-acc_val_log = torch.Tensor(opts2.numIter, 1):fill(0)
-acc_test_log = torch.Tensor(opts2.numIter, 1):fill(0)
+local acc_real_log = torch.Tensor(opts2.numIter, 1):fill(0) 
+local acc_synth_log = torch.Tensor(opts2.numIter, 1):fill(0)
+local acc_val_log = torch.Tensor(opts2.numIter, 1):fill(0)
+local acc_test_log = torch.Tensor(opts2.numIter, 1):fill(0)
 
 -- Initialize Tensors
-batch_real = {}           -- input real batch
-batch_input_synth = {}    -- input synth batch in {y,z} form
-batch_synth = {}          -- input synth batch in image form
-batch_val = {}            -- validation real batch
-batch_test = {}           -- test real batch
+local batch_real = {}           -- input real batch
+local batch_input_synth = {}    -- input synth batch in {y,z} form
+local batch_synth = {}          -- input synth batch in image form
+local batch_val = {}            -- validation real batch
+local batch_test = {}           -- test real batch
 
 local grad_real = {}
 local grad_synth = {}
 local grad_pregen = {}
 
-batch_synth_targets = {}    -- dynamically determined ground truth w.r.t. output of pregen
-
--- Debugging
-synth_rawY_top = torch.Tensor(opts2.numIter, num_synth_train):zero()
-synth_rawY_bot = torch.Tensor(opts2.numIter, num_synth_train):zero()
-synth_targets_auto = torch.Tensor(opts2.numIter, num_synth_train):zero()
-
+local batch_synth_targets = {}    -- dynamically determined ground truth w.r.t. output of pregen
 
 -----------------------------------------------------
 -- (Closure) Train DeepSTN Ranker using Real Pairs --
